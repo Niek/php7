@@ -54,7 +54,7 @@ jobs:
       - name: Download pinned source
         run: |
           mkdir sources out
-          while read -r hash file; do
+          while read -r _ file; do
             curl -fsSL --retry 3 "$SOURCE_URL/$file" -o "sources/$file"
           done < sources.sha256
           (cd sources && sha256sum -c ../sources.sha256)
@@ -99,10 +99,16 @@ jobs:
             tar -cJf "release/$(basename "$dir").tar.xz" -C "$dir" .
             cp "$dir"/*.deb release/
           done
-          while read -r hash file; do
+          while read -r _ file; do
             curl -fsSL --retry 3 "$SOURCE_URL/$file" -o "release/$file"
           done < sources.sha256
-          (cd release && sha256sum -c ../sources.sha256 && sha256sum ./* > SHA256SUMS)
+          (cd release && sha256sum -c ../sources.sha256)
+          tar -cJf release/php7.4-source.tar.xz -C release --files-from <(awk '{print $2}' sources.sha256)
+          # GitHub normalizes tildes in asset names; match that before checksumming.
+          for file in release/*~*; do
+            [ ! -e "$file" ] || mv "$file" "${file//\~/.}"
+          done
+          (cd release && sha256sum ./* > SHA256SUMS)
           gh release create "$TAG" --verify-tag --draft --title "PHP 7.4.33 backports ($TAG)" --notes-file README.md
           gh release upload "$TAG" release/*
           gh release edit "$TAG" --draft=false
