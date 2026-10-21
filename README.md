@@ -4,8 +4,8 @@
 
 **Still running PHP 7.4 on an old Ubuntu or Debian server?** These drop-in `.deb`
 packages patch two critical remote code execution bugs,
-**CVE-2026-109618** and **CVE-2026-109619**, on releases that no longer get
-official updates.
+**CVE-2026-109618** and **CVE-2026-109619**, on Ubuntu and Debian releases
+outside standard support.
 
 | Distribution | Supported releases (amd64) |
 | ------------ | -------------------------------------------------------------- |
@@ -13,8 +13,8 @@ official updates.
 | Debian       | 9 (Stretch), 10 (Buster)                                       |
 
 > [!WARNING]
-> PHP 7.4 is end-of-life and so are these OS releases. Use this to buy time
-> for an upgrade, not as ongoing security support.
+> PHP 7.4 is end-of-life; these OS releases are outside standard support.
+> Use this to buy time for an upgrade, not as ongoing security support.
 
 ## Upgrade
 
@@ -22,18 +22,18 @@ You need Bash, `curl`, `xz-utils` and working APT sources for your release.
 Back up your PHP configuration first, then run:
 
 ```bash
-target=$(. /etc/os-release && echo "$ID$VERSION_ID") &&
-cd "$(mktemp -d)" &&
-curl -fL "https://github.com/Niek/php7/releases/latest/download/php7.4-$target-amd64.tar.xz" -o php7.4.tar.xz &&
-tar -xJf php7.4.tar.xz &&
-sha256sum -c SHA256SUMS &&
+target=$(. /etc/os-release; echo "$ID$VERSION_ID")
+cd "$(mktemp -d)"
+curl -fL "https://github.com/Niek/php7/releases/latest/download/php7.4-$target-amd64.tar.xz" -o php7.4.tar.xz
+tar -xJf php7.4.tar.xz
+sha256sum -c SHA256SUMS
 sudo apt install --only-upgrade ./*.deb
 ```
 
 This detects your release (for example `ubuntu18.04` or `debian10`), checks
 the package checksums, and upgrades only the PHP 7.4 packages you already have
-installed, including extensions, the Apache module and FPM. Nothing new is
-installed. Review APT's proposed changes before accepting.
+installed, including extensions, the Apache module and FPM. APT may install
+required dependencies. Review APT's proposed changes before accepting.
 
 When it finishes, restart PHP-FPM, Apache or any other long-running PHP process.
 
