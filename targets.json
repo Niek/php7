@@ -1,0 +1,14 @@
+{
+  "ubuntu16.04": {
+    "image": "ubuntu@sha256:a3785f78ab8547ae2710c89e627783cfa7ee7824d3468cae6835c9f4eae23ff7",
+    "id": "ubuntu", "version": "16.04", "codename": "xenial", "arch": "amd64"
+  },
+  "ubuntu18.04": {
+    "image": "ubuntu@sha256:dca176c9663a7ba4c1f0e710986f5a25e672842963d95b960191e2d9f7185ebe",
+    "id": "ubuntu", "version": "18.04", "codename": "bionic", "arch": "amd64"
+  },
+  "debian10": {
+    "image": "debian@sha256:32220ea48be72979c9f0810d69f3de9145c9584c2ee966c6ec26edbcf4640c0b",
+    "id": "debian", "version": "10", "codename": "buster", "arch": "amd64"
+  }
+}

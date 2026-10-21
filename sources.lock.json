@@ -1,0 +1,16 @@
+{
+  "php_version": "7.4.33",
+  "package_version": "1:7.4.33-31+php7.20261021.1",
+  "release": "v7.4.33-20261021.1",
+  "source_version": "1:7.4.33-31+0~20261021.121+debian12~1.gbpe9c428",
+  "source_date_epoch": 1792584000,
+  "base_url": "https://packages.sury.org/php/pool/main/p/php7.4/",
+  "upstream_security_commit": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+  "patch_count": 164,
+  "files": {
+    "php7.4_7.4.33.orig.tar.xz.asc": "569a01c7c605a4571fdf7dfadfff4215cc4a63ea5d474c7ec92bd7b4fecfffcb",
+    "php7.4_7.4.33.orig.tar.xz": "924846abf93bc613815c55dd3f5809377813ac62a9ec4eb3778675b82a27b927",
+    "php7.4_7.4.33-31+0~20261021.121+debian12~1.gbpe9c428.debian.tar.xz": "4747b79a87b89a2591497704df4b80e68c7e78b64fbf23c205dca331ebf83496",
+    "php7.4_7.4.33-31+0~20261021.121+debian12~1.gbpe9c428.dsc": "ff093b8d065f79cc81099325070e88573327f0ba740e49eb2d161a5519c296fb"
+  }
+}
