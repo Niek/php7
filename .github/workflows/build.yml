@@ -1,4 +1,4 @@
-name: Build and release
+name: Build PHP 7.4
 on:
   push:
     branches: [main]
@@ -9,76 +9,79 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: build-${{ github.ref }}
-  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+env:
+  REVISION: '1'
+  SOURCE_URL: https://packages.sury.org/php/pool/main/p/php7.4
 
 jobs:
   build:
-    name: PHP 7.4 / ${{ matrix.target }} / amd64
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        target: [ubuntu16.04, ubuntu18.04, debian10]
+        include:
+          - target: ubuntu16.04
+            image: ubuntu:16.04
+          - target: ubuntu18.04
+            image: ubuntu:18.04
+          - target: debian10
+            image: debian:buster
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - name: Verify source provenance
-        run: python3 scripts/verify-origin.py
-      - name: Build and test in disposable target containers
+      - name: Download pinned source
+        run: |
+          mkdir sources out
+          while read -r hash file; do
+            curl -fsSL --retry 3 "$SOURCE_URL/$file" -o "sources/$file"
+          done < sources.sha256
+          (cd sources && sha256sum -c ../sources.sha256)
+      - name: Build native amd64 packages in Docker
         env:
           TARGET: ${{ matrix.target }}
-          JOBS: '4'
-        run: python3 scripts/run.py "$TARGET"
-      - name: Save packages and test evidence
+          IMAGE: ${{ matrix.image }}
+        run: |
+          docker run --rm --platform linux/amd64 \
+            -v "$PWD:/repo:ro" -v "$PWD/sources:/sources:ro" -v "$PWD/out:/out" \
+            -e TARGET -e REVISION -e JOBS=4 "$IMAGE" bash /repo/build.sh 2>&1 | tee out/build.log
+      - uses: actions/upload-artifact@v7
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: php7-${{ matrix.target }}-amd64
-          path: out/${{ matrix.target }}/
-          if-no-files-found: error
-          retention-days: 14
+          name: php7.4-${{ matrix.target }}-amd64
+          path: out/
+          retention-days: 7
 
   release:
-    name: Publish verified release
     if: startsWith(github.ref, 'refs/tags/') && github.repository == 'Niek/php7'
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     permissions:
       contents: write
-      id-token: write
-      attestations: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      - uses: actions/download-artifact@v8
         with:
-          pattern: php7-*-amd64
           path: artifacts
-      - name: Assemble and check release
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
-        run: python3 scripts/release.py
-      - name: Attest release archives
-        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
-        with:
-          subject-path: |
-            release/*.tar.xz
-            release/*.deb
-      - name: Upload all assets, then publish
+          pattern: php7.4-*-amd64
+      - name: Upload release packages and source
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
         run: |
-          if gh release view "$RELEASE_TAG" --json isDraft > /tmp/release.json 2>/dev/null; then
-            python3 -c 'import json; assert json.load(open("/tmp/release.json"))["isDraft"], "Refusing to change a published release"'
-          else
-            gh release create "$RELEASE_TAG" --verify-tag --draft --title "PHP 7.4.33 security backports ($RELEASE_TAG)" --notes-file RELEASE.md
-          fi
-          gh release upload "$RELEASE_TAG" release/* --clobber
-          gh release edit "$RELEASE_TAG" --draft=false
+          test "$TAG" = "v7.4.33-$REVISION"
+          mkdir release
+          for dir in artifacts/*; do
+            tar -cJf "release/$(basename "$dir").tar.xz" -C "$dir" .
+            cp "$dir"/*.deb release/
+          done
+          while read -r hash file; do
+            curl -fsSL --retry 3 "$SOURCE_URL/$file" -o "release/$file"
+          done < sources.sha256
+          (cd release && sha256sum -c ../sources.sha256 && sha256sum ./* > SHA256SUMS)
+          gh release create "$TAG" --verify-tag --draft --title "PHP 7.4.33 backports ($TAG)" --notes-file README.md
+          gh release upload "$TAG" release/*
+          gh release edit "$TAG" --draft=false

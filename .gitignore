@@ -2,6 +2,7 @@
 out/
 release/
 artifacts/
+sources/
 __pycache__/
 *.pyc
 .DS_Store

@@ -20,6 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-This license covers this repository's original build, packaging and test code.
+This license covers this repository's original build code and documentation.
 PHP, bundled components and the Sury patches retain their respective licenses.
 The source bundle and binary packages include their upstream license notices.
