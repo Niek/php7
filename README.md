@@ -16,10 +16,10 @@ PCRE2 or omit Argon2 where the target distribution lacks suitable native librari
 PHP 7.4 is EOL and these OS releases are outside normal support;
 this is a bridge to upgrading, not a promise of continued security support.
 
-## Install or upgrade
+## Upgrade
 
 Back up your PHP configuration and packages first. In **Bash** on **amd64**, choose
-your **exact OS release**, then run the shared install block below. You need
+your **exact OS release**, then run the upgrade block below. You need
 `curl`, `xz-utils` and working APT sources for that release.
 
 ### Ubuntu 16.04 (Xenial)
@@ -99,20 +99,15 @@ cd "$(mktemp -d)" &&
 curl -fL https://github.com/Niek/php7/releases/latest/download/php7.4-debian10-amd64.tar.xz -o php7.4.tar.xz
 ```
 
-### Install the downloaded packages
+### Upgrade installed packages
 
-Run this in the same shell. It verifies the packages and upgrades those already
-installed, including extensions and Apache/FPM packages. With no existing PHP 7.4
-packages, it installs all bundled `php7.4-*` packages, including development and
-debug packages. Review APT's proposed changes before accepting.
+Run this in the same shell to upgrade existing PHP packages, including installed
+extensions and Apache/FPM packages. Review APT's proposed changes before accepting.
 
 ```bash
 tar -xJf php7.4.tar.xz
 sha256sum -c SHA256SUMS
-shopt -s nullglob
-set -- $(dpkg-query -W -f='${db:Status-Status} ${Package}\n' | awk '$1=="installed" {print "./"$2"_*.deb"}')
-if [ "$#" -eq 0 ]; then set -- ./php7.4-*.deb; fi
-sudo apt install "$@"
+sudo apt install --only-upgrade ./*.deb
 ```
 
 Restart any long-running PHP workers after upgrading. Third-party extensions are
