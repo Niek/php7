@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 env:
   REVISION: '1'
   SOURCE_URL: https://packages.sury.org/php/pool/main/p/php7.4
@@ -62,6 +66,7 @@ jobs:
           docker run --rm --platform linux/amd64 \
             -v "$PWD:/repo:ro" -v "$PWD/sources:/sources:ro" -v "$PWD/out:/out" \
             -e TARGET -e REVISION -e JOBS=4 "$IMAGE" bash /repo/build.sh 2>&1 | tee out/build.log
+          test -s out/SHA256SUMS
       - uses: actions/upload-artifact@v7
         if: always()
         with:

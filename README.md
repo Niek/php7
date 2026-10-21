@@ -14,8 +14,8 @@ PCRE2 or omit Argon2 where the target distribution lacks suitable native librari
 
 Download packages for your **exact OS release** from [Releases](https://github.com/Niek/php7/releases),
 verify `SHA256SUMS`, back up your installation, then install the matching `.deb`
-files with APT. PHP 7.4 and these operating systems remain EOL; this is a bridge
-to upgrading, not a promise of continued security support.
+files with APT. PHP 7.4 is EOL and these OS releases are outside normal support;
+this is a bridge to upgrading, not a promise of continued security support.
 
 Pushes and pull requests build the matrix. Push `v7.4.33-1` to publish packages,
 build logs, checksums and corresponding source after all builds succeed. Increase

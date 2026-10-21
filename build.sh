@@ -31,6 +31,11 @@ sha256sum -c /repo/sources.sha256
 dpkg-source --no-check -x ./*.dsc /build/php
 cd /build/php
 
+# The optional telemetry header uses newer libsodium APIs even when telemetry
+# is disabled. Guard it the same way as its call sites; security patches stay intact.
+sed -i 's/#include "secure_dns_telemetry.h"/#ifdef TELEMETRY_HOST\n#include "secure_dns_telemetry.h"\n#endif/' \
+  sapi/apache2handler/php_functions.c sapi/fpm/fpm/fpm_main.c
+
 # Keep Sury's packaging, including extensions, FPM units, pools and maintainer
 # scripts. Adjust only compatibility with the target's native build tools/libs.
 sed -i 's/php-common (>= 1:81~)/php-common (>= 1:35)/g' debian/control debian/control.in debian/php-module.control.in
@@ -43,7 +48,8 @@ if dpkg --compare-versions "$pcre_version" lt 10.30; then
   sed -i '/libpcre2-dev (>= 10.30),/d' debian/control debian/control.in
   sed -i '/--with-external-pcre/d' debian/rules
 fi
-if ! apt-cache policy libargon2-dev libargon2-0-dev | awk '/Candidate:/ && $2 != "(none)" {found=1} END {exit !found}'; then
+argon_version=$(apt-cache policy libargon2-dev libargon2-0-dev | awk '/Candidate:/ && $2 != "(none)" {version=$2} END {print version}')
+if [ -z "$argon_version" ] || dpkg --compare-versions "$argon_version" lt '0~20161029'; then
   sed -i '/libargon2-dev | libargon2-0-dev,/d' debian/control debian/control.in
   sed -i '/--with-password-argon2=/d' debian/rules
 fi
