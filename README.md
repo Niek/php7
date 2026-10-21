@@ -103,25 +103,16 @@ curl -fL https://github.com/Niek/php7/releases/latest/download/php7.4-debian10-a
 
 Run this in the same shell. It verifies the packages and upgrades those already
 installed, including extensions and Apache/FPM packages. With no existing PHP 7.4
-packages, it installs CLI and FPM. Review APT's proposed changes before accepting.
+packages, it installs all bundled `php7.4-*` packages, including development and
+debug packages. Review APT's proposed changes before accepting.
 
 ```bash
-(
-  set -e
-  tar -xJf php7.4.tar.xz
-  sha256sum -c SHA256SUMS
-  packages=()
-  for deb in ./*.deb; do
-    package=$(dpkg-deb -f "$deb" Package)
-    if dpkg-query -W -f='${db:Status-Status}' "$package" 2>/dev/null | grep -qx installed; then
-      packages+=("$deb")
-    fi
-  done
-  if [ "${#packages[@]}" -eq 0 ]; then
-    packages=(./php7.4-{common,cli,fpm,opcache,readline}_*.deb)
-  fi
-  sudo apt install "${packages[@]}"
-)
+tar -xJf php7.4.tar.xz
+sha256sum -c SHA256SUMS
+shopt -s nullglob
+set -- $(dpkg-query -W -f='${db:Status-Status} ${Package}\n' | awk '$1=="installed" {print "./"$2"_*.deb"}')
+if [ "$#" -eq 0 ]; then set -- ./php7.4-*.deb; fi
+sudo apt install "$@"
 ```
 
 Restart any long-running PHP workers after upgrading. Third-party extensions are
