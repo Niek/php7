@@ -23,8 +23,24 @@ jobs:
         include:
           - target: ubuntu16.04
             image: ubuntu:16.04
+          - target: ubuntu16.10
+            image: ubuntu:16.10
+          - target: ubuntu17.04
+            image: ubuntu:17.04
+          - target: ubuntu17.10
+            image: ubuntu:17.10
           - target: ubuntu18.04
             image: ubuntu:18.04
+          - target: ubuntu18.10
+            image: ubuntu:18.10
+          - target: ubuntu19.04
+            image: ubuntu:19.04
+          - target: ubuntu19.10
+            image: ubuntu:19.10
+          - target: ubuntu20.04
+            image: ubuntu:20.04
+          - target: debian9
+            image: debian:stretch
           - target: debian10
             image: debian:buster
     steps:
