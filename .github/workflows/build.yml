@@ -14,7 +14,7 @@ defaults:
     shell: bash
 
 env:
-  REVISION: '1'
+  REVISION: '2'
   SOURCE_URL: https://packages.sury.org/php/pool/main/p/php7.4
 
 jobs:
@@ -47,6 +47,8 @@ jobs:
             image: debian:stretch
           - target: debian10
             image: debian:buster
+          - target: debian11
+            image: debian:bullseye
     steps:
       - uses: actions/checkout@v7
         with:

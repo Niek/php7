@@ -10,7 +10,7 @@ outside standard support.
 | Distribution | Supported releases (amd64) |
 | ------------ | -------------------------------------------------------------- |
 | Ubuntu       | 16.04, 16.10, 17.04, 17.10, 18.04, 18.10, 19.04, 19.10, 20.04 |
-| Debian       | 9 (Stretch), 10 (Buster)                                       |
+| Debian       | 9 (Stretch), 10 (Buster), 11 (Bullseye)                         |
 
 > [!WARNING]
 > PHP 7.4 is end-of-life; these OS releases are outside standard support.

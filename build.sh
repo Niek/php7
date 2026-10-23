@@ -7,8 +7,10 @@ codename=${VERSION_CODENAME:-${UBUNTU_CODENAME:-}}
 
 if [ "$ID" = debian ]; then
   [ "$VERSION_ID" != 9 ] || codename=stretch
+  security_suite=$codename/updates
+  [ "$VERSION_ID" != 11 ] || security_suite=$codename-security
   printf '%s\n' "deb http://archive.debian.org/debian $codename main" \
-    "deb http://archive.debian.org/debian-security $codename/updates main" > /etc/apt/sources.list
+    "deb http://archive.debian.org/debian-security $security_suite main" > /etc/apt/sources.list
   echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive
 else
   case "$VERSION_ID" in
