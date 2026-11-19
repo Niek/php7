@@ -3,9 +3,10 @@
 [![Build](https://github.com/Niek/php7/actions/workflows/build.yml/badge.svg)](https://github.com/Niek/php7/actions/workflows/build.yml)
 
 **Still running PHP 7.4 on an old Ubuntu or Debian server?** These drop-in `.deb`
-packages patch two critical remote code execution bugs,
-**CVE-2026-109618** and **CVE-2026-109619**, on Ubuntu and Debian releases
-outside standard support.
+packages bring in the latest PHP 7.4 security fixes from
+[Sury's packages](https://packages.sury.org/php/), including critical remote
+code execution bugs such as **CVE-2026-109618**, **CVE-2026-109619** and
+**CVE-2026-129496**, on Ubuntu and Debian releases outside standard support.
 
 | Distribution | Supported releases (amd64) |
 | ------------ | -------------------------------------------------------------- |
@@ -39,9 +40,17 @@ When it finishes, restart PHP-FPM, Apache or any other long-running PHP process.
 
 ## What changes
 
-- **Fixed:** CVE-2026-109618 and CVE-2026-109619, using the
-  [official upstream backports](https://github.com/php/php-src/archive/refs/heads/PHP-7.4-CVE-2026-109618-109619.zip)
-  included in Sury's PHP 7.4.33 revision 31.
+- **Fixed:** every security backport in Sury's PHP 7.4.33 revision 37, including:
+  - CVE-2026-109618 and CVE-2026-109619 (remote code execution), using the
+    [official upstream backports](https://github.com/php/php-src/archive/refs/heads/PHP-7.4-CVE-2026-109618-109619.zip)
+  - CVE-2026-129496, CVE-2026-126714 and CVE-2026-115560 (remote code execution
+    via the timezone cache and sessions)
+  - CVE-2026-129538 (PHP-CGI out-of-bounds write) and CVE-2026-128090 (PHAR
+    signature bypass)
+  - CVE-2026-129289, CVE-2026-129291 and CVE-2026-129292 (PHP-FPM request
+    smuggling, use-after-free and status page XSS)
+  - CVE-2026-15353, CVE-2026-129506, CVE-2026-128064, CVE-2026-127960 and
+    CVE-2024-11235 (SOAP, HTTP streams and request shutdown)
 - **Disabled:** session upload-progress tracking, as part of the fix. Regular
   file uploads still work.
 - **On releases with older libraries:** PCRE2 is bundled instead of using the

@@ -61,7 +61,9 @@ sed -i 's/libtidy-dev (>= 1:5.2.0)/libtidy-dev/' debian/control debian/control.i
 export DEB_BUILD_OPTIONS="nocheck parallel=${JOBS:-4}"
 export DEB_BUILD_PROFILES=nocheck
 export DEBFULLNAME='php7 contributors' DEBEMAIL='noreply@github.com'
-dch --newversion "1:7.4.33-31+php7.${REVISION:-1}~${TARGET}.1" --distribution "$codename" \
+# Keep Sury's epoch and revision (e.g. 1:7.4.33-37) so newer Sury sources sort higher.
+sury_version=$(dpkg-parsechangelog -S Version)
+dch --newversion "${sury_version%%+*}+php7.${REVISION:-1}~${TARGET}.1" --distribution "$codename" \
   'Rebuild Sury security backports for this distribution.'
 mk-build-deps --install --remove --tool 'apt-get -y --no-install-recommends' debian/control
 dpkg-buildpackage -us -uc -b -j"${JOBS:-4}"
